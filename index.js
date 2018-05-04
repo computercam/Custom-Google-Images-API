@@ -5,7 +5,11 @@ const puppeteer = require('puppeteer');
 
 http.createServer(function(req, res) {
 
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.setHeader('Content-Type': 'text/plain' );
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,text/plain');
+    res.setHeader('Access-Control-Allow-Credentials', true);
 
     let JSONData = null;
     const q = url.parse(req.url, true).query;
