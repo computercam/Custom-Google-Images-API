@@ -15,11 +15,15 @@ http.createServer(function(req, res) {
     const q = url.parse(req.url, true).query;
 
     let gimgSearch = 'https://google.com/search?q=' + q.keywords + '&tbm=isch';
-
-    if (q.rimg) {
-        gimgSearch += '&tbs=rimg:' + q.rimg;
+    
+    // TODO: Ability to get the second or following page of results. Right now only allows for first 100
+    switch(q) {
+        case q.rimg:
+            gimgSearch += '&tbs=rimg:' + q.rimg;
+        case q.safe:
+            gimgSearch += '&safe=active';      
     }
-
+    
     puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] }).then(async browser => {
             const page = await browser.newPage();
             await page.goto(gimgSearch);
@@ -38,6 +42,7 @@ http.createServer(function(req, res) {
             await browser.close();
         })
         .then(() => {
+            // Getting related image links.
             let requests = [];
             JSONData.forEach((item, index) => {
                 requests[index] = axios({
