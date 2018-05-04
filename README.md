@@ -46,4 +46,3 @@ axios.get('http://myserver.com//?keywords=diamon+rain')
 - Node JS for the base.
 - Puppeteer for scraping.
 - Axios for XHR.
-- BASH for installing dependencies on clean Debian based Server.
