@@ -77,6 +77,7 @@ http.createServer(function(req, res) {
                   }
                 });
             }).then(() => {
+                // TODO: Remove unneeded keys from the image meta data object.
                 res.write(JSON.stringify(JSONData));
                 res.end();
             });
