@@ -52,7 +52,7 @@ http.createServer(function(req, res) {
                     method: 'get',
                     responseType: 'text',
                     params: {
-                        q: 'purple+hell',
+                        q: q.keywords,
                         ved: item.ved,
                         vet: '1' + item + '..i',
                         imgurl: item.ou,

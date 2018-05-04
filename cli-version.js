@@ -44,7 +44,7 @@ puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] }).then(as
                 method: 'get',
                 responseType: 'text',
                 params: {
-                    q: 'purple+hell',
+                    q: q[2],
                     ved: item.ved,
                     vet: '1' + item + '..i',
                     imgurl: item.ou,
