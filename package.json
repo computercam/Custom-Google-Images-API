@@ -1,0 +1,23 @@
+{
+  "name": "gimages_scraper",
+  "version": "1.0.0",
+  "description": "A very basic image metadata scraper for google images.",
+  "main": "gimg-scraper.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "scraper",
+    "google-images"
+  ],
+  "author": "Cameron Sanders - limitunknown.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/abstracted"
+  },
+  "homepage": "https://github.com/abstracted",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "puppeteer": "^1.3.0"
+  }
+}
