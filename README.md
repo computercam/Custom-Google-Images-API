@@ -23,7 +23,7 @@ You can query related image results as well.
 You can use your favorite XHR library as well
 
 ```javascript
-axios.get('http://myserver.com//?keywords=diamon+rain')
+axios.get('http://myserver.com/?keywords=diamon+rain')
 .then(function (response) {
     console.log(response);
 })
