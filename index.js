@@ -5,7 +5,7 @@ const puppeteer = require('puppeteer');
 
 http.createServer(function(req, res) {
 
-    res.setHeader('Content-Type': 'text/plain' );
+    res.setHeader('Content-Type', 'text/plain' );
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET');
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,text/plain');
