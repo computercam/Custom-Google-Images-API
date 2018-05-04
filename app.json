@@ -1,7 +1,0 @@
-{
-  "name": "Google Images Metadata Scraper",
-  "description": "A google images metadata scaper using node, puppeteer & axious",
-  "logo": "https://cdn.rawgit.com/heroku/node-js-getting-started/master/public/node.svg",
-  "keywords": ["node", "axios", "puppeteer", "google images", "scraper", "metadata"],
-  "image": "heroku/nodejs"
-}
