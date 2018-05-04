@@ -32,9 +32,6 @@ axios.get('http://myserver.com//?keywords=diamon+rain')
 });
 ```
 ### 
-### Command line version:
-There is a [***command line version***](https://gist.github.com/abstracted/2aa16a27b73cad040f855cd9f9c2bea1) as well, it probably won't get updated but you are welcome to tweak/use it.
-### 
 ### Todo
 - [ ] Ability to limit the number of results returned.
 - [ ] Ability to get the second and following page of results. (Currently only gets the first 100 images)
