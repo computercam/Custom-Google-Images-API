@@ -45,7 +45,6 @@ http.createServer(function(req, res) {
 		    'st',
 		    'th',
 		    'tw',
-		    'selector',
 		    'ved'
 	    ];
 	    unnecessary.forEach(property => {
@@ -63,7 +62,6 @@ http.createServer(function(req, res) {
                 let data = [];
                 nodeList.forEach((node, index) => {
                     data[index] = JSON.parse(node.lastElementChild.textContent);
-                    data[index].selector = '[data-ri="' + index + '"]';
                     data[index].ved = node.dataset.ved;
                 });
                 return data;
