@@ -37,7 +37,6 @@ axios.get('http://myserver.com/?keywords=diamon+rain')
 - [ ] Ability to limit the number of results returned.
 - [ ] Ability to get the second and following page of results. (Currently only gets the first 100 images)
 - [ ] More fine grained querying options for image results (Such as color, safe search options, image type, size ect)
-- [ ] Remove additonal properties from returned json results. (Some of the properties are used temporarily for addtional ajax queries and aren't very useful)
 - [ ] Caching for previously queried results.
 - [ ] Throttling and proxying to prevent getting flagged. (Haven't had this happen to me yet)
 
