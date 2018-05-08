@@ -23,6 +23,35 @@ http.createServer(function(req, res) {
         case q.safe:
             gimgSearch += '&safe=active';      
     }
+
+    function cleanMetadata() {
+	    let unnecessary = [
+		    'cb',
+		    'cl',
+		    'cr',
+		    'id',
+		    'isu',
+		    'itg',
+		    'ity',
+		    'oh',
+		    'ow',
+		    'pt',
+		    'rh',
+		    'rid',
+		    'rt',
+		    'ru',
+		    's',
+		    'sc',
+		    'st',
+		    'th',
+		    'tw',
+		    'selector',
+		    'ved'
+	    ];
+	    unnecessary.forEach(property => {
+		    delete JSONData[property];
+	    });
+    }
     
     puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] }).then(async browser => {
             const page = await browser.newPage();
@@ -77,8 +106,8 @@ http.createServer(function(req, res) {
                   }
                 });
             }).then(() => {
-                // TODO: Remove unneeded keys from the image meta data object.
-                res.write(JSON.stringify(JSONData));
+	            cleanMetadata();
+	            res.write(JSON.stringify(JSONData));
                 res.end();
             });
         });
