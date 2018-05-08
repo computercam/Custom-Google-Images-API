@@ -2,9 +2,7 @@
 
 ### Summary
 - A very basic image metadata scraper for google images. Created to be used in my SCAMPER/Koolpix Project.
-- The main reason you would use this over other scrapers is if you need more metadata about the image.
 - This scraper's ***main feature*** is the ability to ***get the related images link*** for an image.
-- More query features and meta data types are on the todo list below.
 
 ### Setup
 - Spin up an ubuntu based server distro.
