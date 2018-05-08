@@ -5,13 +5,13 @@ const puppeteer = require('puppeteer');
 
 http.createServer(function(req, res) {
 
-    res.setHeader('Content-Type', 'text/json' );
+    res.setHeader('Content-Type', 'text/arr' );
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET');
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,text/json');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,text/arr');
     res.setHeader('Access-Control-Allow-Credentials', true);
 
-    let JSONData = null;
+    let responseData = null;
     const q = url.parse(req.url, true).query;
 
     let gimgSearch = 'https://google.com/search?q=' + q.keywords + '&tbm=isch';
@@ -24,8 +24,8 @@ http.createServer(function(req, res) {
             gimgSearch += '&safe=active';      
     }
 
-    function cleanMetadata() {
-	    let unnecessary = [
+    function cleanMetadata(arr) {
+	    const unnecessary = [
 		    'cb',
 		    'cl',
 		    'cr',
@@ -45,23 +45,28 @@ http.createServer(function(req, res) {
 		    'st',
 		    'th',
 		    'tw',
+		    'selector',
 		    'ved'
 	    ];
-	    unnecessary.forEach(property => {
-		    delete JSONData[property];
-	    });
+	    for ( let key of arr ) {
+		    for ( let property of unnecessary ) {
+			    delete key[property];
+		    }
+	    }
+	    return arr;
     }
     
     puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] }).then(async browser => {
             const page = await browser.newPage();
             await page.goto(gimgSearch);
-            await page.waitForSelector('[data-ri="99"]');
+            await page.waitForSelector('[data-ri="99"');
 
-            JSONData = await page.evaluate(() => {
+            responseData = await page.evaluate(() => {
                 let nodeList = Array.from(document.querySelectorAll('#search [data-ri]'));
                 let data = [];
                 nodeList.forEach((node, index) => {
                     data[index] = JSON.parse(node.lastElementChild.textContent);
+                    data[index].selector = '[data-ri="' + index + '"]';
                     data[index].ved = node.dataset.ved;
                 });
                 return data;
@@ -71,7 +76,7 @@ http.createServer(function(req, res) {
         .then(() => {
             // Getting related image links.
             let requests = [];
-            JSONData.forEach((item, index) => {
+            responseData.forEach((item, index) => {
                 requests[index] = axios({
                     timeout: 10000,
                     baseURL: 'https://www.google.com/async/',
@@ -98,14 +103,14 @@ http.createServer(function(req, res) {
                 results.forEach((result, index) => {
                   let rimg = result.data.match(/tbs=rimg:([A-Za-z0-9_-])+/gm);
                   if (rimg === null) {
-                    JSONData[index].rimg = false;
+                    responseData[index].rimg = false;
                   } else {
-                    JSONData[index].rimg = rimg[0].replace(/tbs=rimg:/gm, '');  
+                    responseData[index].rimg = rimg[0].replace(/tbs=rimg:/gm, '');
                   }
                 });
             }).then(() => {
-	            cleanMetadata();
-	            res.write(JSON.stringify(JSONData));
+	            responseData = cleanMetadata(responseData);
+	            res.write(JSON.stringify(responseData));
                 res.end();
             });
         });
