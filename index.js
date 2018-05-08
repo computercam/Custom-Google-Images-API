@@ -24,16 +24,16 @@ http.createServer(function(req, res) {
 			gimgSearch += '&safe=active';
 	}
 
-	function cleanMetadata(arr) {
-		let newArr = [];
-		for ( let index in arr ) {
-			newArr[index] = {
-				arr[index].ou,
-				arr[index].tu,
-				arr[index].rimg
+	function cleanMetadata(data) {
+		let newData = [];
+		data.forEach((item, index, array) => {
+			newData[index] = {
+				ou: item.ou,
+				tu: item.tu,
+				rimg: item.rimg
 			}
-		}
-		return newArr;
+		});
+		return newData;
 	}
 
 	puppeteer.launch({ args: [ '--no-sandbox', '--disable-setuid-sandbox' ] }).then(async browser => {
