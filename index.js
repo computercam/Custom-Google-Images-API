@@ -25,34 +25,15 @@ http.createServer(function(req, res) {
 	}
 
 	function cleanMetadata(arr) {
-		const unnecessary = [
-			'cb',
-			'cl',
-			'cr',
-			'id',
-			'isu',
-			'itg',
-			'ity',
-			'oh',
-			'ow',
-			'pt',
-			'rh',
-			'rid',
-			'rt',
-			'ru',
-			's',
-			'sc',
-			'st',
-			'th',
-			'tw',
-			'ved'
-		];
-		for ( let key of arr ) {
-			for ( let property of unnecessary ) {
-				delete key[ property ];
+		let newArr = [];
+		for ( let index in arr ) {
+			newArr[index] = {
+				arr[index].ou,
+				arr[index].tu,
+				arr[index].rimg
 			}
 		}
-		return arr;
+		return newArr;
 	}
 
 	puppeteer.launch({ args: [ '--no-sandbox', '--disable-setuid-sandbox' ] }).then(async browser => {
