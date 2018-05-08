@@ -19,7 +19,7 @@ if (q[3]) gimgSearch += '&tbs=rimg:' + q[3];
 puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] }).then(async browser => {
         const page = await browser.newPage();
         await page.goto(gimgSearch);
-        await page.waitForSelector('[data-ri="99"');
+        await page.waitForSelector('[data-ri="99"]');
 
         JSONData = await page.evaluate(() => {
             let nodeList = Array.from(document.querySelectorAll('#search [data-ri]'));
