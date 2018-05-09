@@ -5,10 +5,9 @@ const puppeteer = require('puppeteer');
 
 http.createServer(function(req, res) {
 
-	res.setHeader('Content-Type', 'text/arr');
+	res.setHeader('Content-Type', 'text/json');
 	res.setHeader('Access-Control-Allow-Origin', '*');
 	res.setHeader('Access-Control-Allow-Methods', 'GET');
-	res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,text/arr');
 	res.setHeader('Access-Control-Allow-Credentials', true);
 
 	let responseData = null;
@@ -39,7 +38,7 @@ http.createServer(function(req, res) {
 	puppeteer.launch({ args: [ '--no-sandbox', '--disable-setuid-sandbox' ] }).then(async browser => {
 		const page = await browser.newPage();
 		await page.goto(gimgSearch);
-		await page.waitForSelector('[data-ri="99"]');
+		await page.waitFor(1000);
 		responseData = await page.evaluate(() => {
 			let nodeList = Array.from(document.querySelectorAll('#search [data-ri]'));
 			let data = [];
