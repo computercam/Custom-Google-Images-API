@@ -28,8 +28,13 @@ http.createServer(function(req, res) {
 		data.forEach((item, index, array) => {
 			newData[index] = {
 				ou: item.ou,
+				oh: item.oh,
+				ow: item.ow,
 				tu: item.tu,
-				rimg: item.rimg
+				th: item.th,
+				hw: item.tw,
+				ru: item.ru,
+				rimg: item.rimg,
 			}
 		});
 		return newData;
