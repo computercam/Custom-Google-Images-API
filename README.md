@@ -31,12 +31,11 @@ axios.get('http://myserver.com/?keywords=diamon+rain')
 ```
 ### 
 ### Todo
-- [ ] Systemd script to start the app automatically on load (This will be done very soon)
 - [ ] Ability to limit the number of results returned.
 - [ ] Ability to get the second and following page of results. (Currently only gets the first 100 images)
 - [ ] More fine grained querying options for image results (Such as color, safe search options, image type, size ect)
 - [ ] Caching for previously queried results.
-- [ ] Throttling and proxying to prevent getting flagged. (Haven't had this happen to me yet)
+- [ ] Throttling and proxying to prevent getting flagged. (This hasn't been a problem yet)
 
 ### 
 ### What's it using?
