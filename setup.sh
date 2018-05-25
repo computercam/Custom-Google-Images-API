@@ -21,7 +21,7 @@ npm install
 # Install Systemd Service
 echo -e "Installing Application \n"
 
-PUB_IP='curl http://ipecho.net/plain; echo'
+PUB_IP='$(curl http://ipecho.net/plain; echo)'
 PWD=$(pwd | sed 's/\//\\\//g')
 NODE=$(which node | sed 's/\//\\\//g')
 START_COMMAND="${NODE} ${PWD}\/index.js"
