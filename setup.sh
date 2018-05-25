@@ -35,8 +35,8 @@ systemctl start gimgmetadata.service
 
 # Information
 echo -e "Scraper Installed :)"
-echo -e "\nTest is online at: "
+echo -e "\nTest it online at:"
 echo -e "http://${PUB_IP}/?keywords=saturn+rain"
-echo -e "\nOr locallyis online at: " \n"
+echo -e "\nOr locally at:"
 echo -e "http://localhost/?keywords=saturn+rain"
 exit 0
