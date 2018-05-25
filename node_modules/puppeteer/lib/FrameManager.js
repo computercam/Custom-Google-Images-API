@@ -366,12 +366,9 @@ class Frame {
    * @return {!Promise<(!Object|undefined)>}
    */
   async $eval(selector, pageFunction, ...args) {
-    const elementHandle = await this.$(selector);
-    if (!elementHandle)
-      throw new Error(`Error: failed to find element matching selector "${selector}"`);
-    const result = await this.evaluate(pageFunction, elementHandle, ...args);
-    await elementHandle.dispose();
-    return result;
+    const document = await this._document();
+    const value = await document.$eval(selector, pageFunction, ...args);
+    return value;
   }
 
   /**
@@ -774,6 +771,8 @@ class Frame {
    */
   _navigated(framePayload) {
     this._name = framePayload.name;
+    // TODO(lushnikov): remove this once requestInterception has loaderId exposed.
+    this._navigationURL = framePayload.url;
     this._url = framePayload.url;
   }
 

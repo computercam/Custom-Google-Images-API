@@ -50,6 +50,7 @@ class Page extends EventEmitter {
       client.send('Runtime.enable', {}),
       client.send('Security.enable', {}),
       client.send('Performance.enable', {}),
+      client.send('Log.enable', {}),
     ]);
     if (ignoreHTTPSErrors)
       await client.send('Security.setOverrideCertificateErrors', {override: true});
@@ -103,7 +104,7 @@ class Page extends EventEmitter {
     client.on('Security.certificateError', event => this._onCertificateError(event));
     client.on('Inspector.targetCrashed', event => this._onTargetCrashed());
     client.on('Performance.metrics', event => this._emitMetrics(event));
-
+    client.on('Log.entryAdded', event => this._onLogEntryAdded(event));
     this._target._isClosedPromise.then(() => this.emit(Page.Events.Close));
   }
 
@@ -114,8 +115,23 @@ class Page extends EventEmitter {
     return this._target;
   }
 
+  /**
+   * @return {!Puppeteer.Browser}
+   */
+  browser() {
+    return this._target.browser();
+  }
+
   _onTargetCrashed() {
     this.emit('error', new Error('Page crashed!'));
+  }
+
+  _onLogEntryAdded(event) {
+    const {level, text, args} = event.entry;
+    if (args)
+      args.map(arg => helper.releaseObject(this._client, arg));
+
+    this.emit(Page.Events.Console, new ConsoleMessage(level, text));
   }
 
   /**
@@ -508,7 +524,7 @@ class Page extends EventEmitter {
     helper.removeEventListeners(eventListeners);
     if (error)
       throw error;
-    const request = requests.get(this.mainFrame().url());
+    const request = requests.get(mainFrame._navigationURL);
     return request ? request.response() : null;
 
     /**
@@ -680,7 +696,7 @@ class Page extends EventEmitter {
       console.assert(options.type === 'png' || options.type === 'jpeg', 'Unknown options.type value: ' + options.type);
       screenshotType = options.type;
     } else if (options.path) {
-      const mimeType = mime.lookup(options.path);
+      const mimeType = mime.getType(options.path);
       if (mimeType === 'image/png')
         screenshotType = 'png';
       else if (mimeType === 'image/jpeg')
@@ -742,7 +758,7 @@ class Page extends EventEmitter {
     if (options.fullPage)
       await this.setViewport(this._viewport);
 
-    const buffer = new Buffer(result.data, 'base64');
+    const buffer = Buffer.from(result.data, 'base64');
     if (options.path)
       await writeFileAsync(options.path, buffer);
     return buffer;
@@ -794,7 +810,7 @@ class Page extends EventEmitter {
       marginRight: marginRight,
       pageRanges: pageRanges
     });
-    const buffer = new Buffer(result.data, 'base64');
+    const buffer = Buffer.from(result.data, 'base64');
     if (options.path)
       await writeFileAsync(options.path, buffer);
     return buffer;
@@ -807,10 +823,18 @@ class Page extends EventEmitter {
     return this.mainFrame().title();
   }
 
-  async close() {
+  /**
+   * @param {!{runBeforeUnload: (boolean|undefined)}=} options
+   */
+  async close(options = {runBeforeUnload: undefined}) {
     console.assert(!!this._client._connection, 'Protocol error: Connection closed. Most likely the page has been closed.');
-    await this._client._connection.send('Target.closeTarget', { targetId: this._target._targetId });
-    await this._target._isClosedPromise;
+    const runBeforeUnload = !!options.runBeforeUnload;
+    if (runBeforeUnload) {
+      await this._client.send('Page.close');
+    } else {
+      await this._client._connection.send('Target.closeTarget', { targetId: this._target._targetId });
+      await this._target._isClosedPromise;
+    }
   }
 
   /**
@@ -1041,7 +1065,7 @@ class ConsoleMessage {
    * @param {string} text
    * @param {!Array<*>} args
    */
-  constructor(type, text, args) {
+  constructor(type, text, args = []) {
     this._type = type;
     this._text = text;
     this._args = args;

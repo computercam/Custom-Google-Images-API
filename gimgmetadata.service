@@ -1,0 +1,11 @@
+[Unit]
+Description=gimgmetadata scraper
+After=network.target
+
+[Service]
+WorkingDirectory=__PWD__
+ExecStart=__START_COMMAND__
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
