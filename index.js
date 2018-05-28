@@ -32,7 +32,7 @@ http.createServer(function(req, res) {
 				ow: item.ow,
 				tu: item.tu,
 				th: item.th,
-				hw: item.tw,
+				tw: item.tw,
 				ru: item.ru,
 				rimg: item.rimg,
 			}
