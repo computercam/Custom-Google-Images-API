@@ -33,8 +33,11 @@ http.createServer(function(req, res) {
 				tu: item.tu,
 				th: item.th,
 				tw: item.tw,
-				ru: item.ru,
 				rimg: item.rimg,
+				ru: item.ru,
+				pt: item.pt,
+				st: item.st,
+				s: item.s
 			}
 		});
 		return newData;
