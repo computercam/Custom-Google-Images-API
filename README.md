@@ -1,7 +1,7 @@
 # Google Images Metadata Scraper
 
 ### Summary
-- A very basic image metadata scraper for google images. Created to be used in my SCAMPER/Koolpix Project.
+- A very basic image metadata scraper for google images. Created to be used in my Pixagen Project.
 - This scraper's ***main feature*** is the ability to ***get the related images link*** for an image.
 
 ### Setup
