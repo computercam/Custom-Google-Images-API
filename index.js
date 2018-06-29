@@ -23,6 +23,10 @@ function cleanMetadata (data) {
   return newData
 }
 
+function cleanSbi (url) {
+  return url.replace(/^((.+\/[^.]+)(\.jpg|\.gif|\.jpeg|\.png|\.bmp|tiff))(.+)$/g, '$1')
+}
+
 function isNotEmpty (str) {
   return !(!str || str.length === 0 || typeof str === 'undefined')
 }
@@ -30,7 +34,8 @@ function isNotEmpty (str) {
 function parseQuery (q) {
   let str = 'https://google.com/search?q='
   if (isNotEmpty(q.sbi)) {
-    str += encodeURIComponent(q.sbi) + '.jpg' + '&tbm=isch'
+    q.sbi = cleanSbi(q.sbi)
+    str += encodeURIComponent(q.sbi) + '&tbm=isch'
   } else {
     q.keywords = q.keywords.replace(/\s+/gm, '+')
     if (isNotEmpty(q.keywords)) str += q.keywords + '&tbm=isch'
@@ -53,7 +58,7 @@ http
       let gimgSearch = parseQuery(q)
 
       puppeteer
-        .launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
+        .launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] })
         .then(async browser => {
           const page = await browser.newPage()
           await page.goto(gimgSearch, { waitUntil: 'load' })
@@ -75,10 +80,24 @@ http
               return 'https://www.google.com' + href
             })
             await page.goto(gimgSearch, { waitUntil: 'domcontentloaded' })
-            gimgSearch = await page.evaluate(() => {
-              let href = document.querySelector('.iu-card-header').getAttribute('href')
-              return 'https://www.google.com' + href
+            let findNext = await page.evaluate(() => {
+              let next = { href: false, keywords: false }
+              let el = document.querySelector('.iu-card-header')
+              if (el !== null) {
+                next.href = el.getAttribute('href')
+              } else {
+                let el = document.querySelector('#topstuff > .card-section')
+                next.keywords = el.lastChild.querySelector('a').getAttribute('href')
+                next.keywords = next.keywords.match(/q=([^&]+)/g)[0].replace(/q=/g, '')
+              }
+              return next
             })
+            if (findNext.keywords !== false) {
+              gimgSearch = parseQuery({ keywords: findNext.keywords })
+              console.log(gimgSearch)
+            } else {
+              gimgSearch = 'https://www.google.com' + findNext.href
+            }
             await page.goto(gimgSearch, { waitUntil: 'load' })
             let responseDataSBI = await page.evaluate(() => {
               let nodeList = Array.from(
@@ -93,7 +112,6 @@ http
             })
             responseData = responseData.concat(responseDataSBI)
           }
-
           await browser.close()
         })
         .then(() => {
