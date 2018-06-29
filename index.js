@@ -58,7 +58,7 @@ http
       let gimgSearch = parseQuery(q)
 
       puppeteer
-        .launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] })
+        .launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
         .then(async browser => {
           const page = await browser.newPage()
           await page.goto(gimgSearch, { waitUntil: 'load' })
@@ -94,7 +94,6 @@ http
             })
             if (findNext.keywords !== false) {
               gimgSearch = parseQuery({ keywords: findNext.keywords })
-              console.log(gimgSearch)
             } else {
               gimgSearch = 'https://www.google.com' + findNext.href
             }
