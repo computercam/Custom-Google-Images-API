@@ -3,7 +3,7 @@ const url = require('url')
 const axios = require('axios')
 const puppeteer = require('puppeteer')
 
-function cleanMetadata (data) {
+function cleanMetadata (data, query) {
   let newData = []
   data.forEach((item, index) => {
     newData[index] = {
@@ -19,7 +19,14 @@ function cleanMetadata (data) {
       st: item.st,
       s: item.s
     }
+    if (typeof query.retain !== 'undefined') {
+      let retain = query.retain
+      retain = JSON.parse(retain)
+      newData[index].okeys = retain.okeys
+      newData[index].ocats = retain.ocats
+    }
   })
+  console.log(newData)
   return newData
 }
 
@@ -199,7 +206,7 @@ http
                 })
               })
               .then(() => {
-                responseData = cleanMetadata(responseData)
+                responseData = cleanMetadata(responseData, q)
                 res.write(JSON.stringify(responseData))
                 res.end()
               })
