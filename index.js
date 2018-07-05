@@ -229,6 +229,6 @@ require('greenlock-express').create({
   agreeTos: true,
   approveDomains: [ 'gimgmetadata.limitunknown.com', 'www.gimgmetadata.limitunknown.com' ],
   configDir: '~/.config/acme/',
-  app: require('express')().use('/', handler(req, res),
+  app: require('express')().use('/', handler,
   communityMember: true
 }).listen(80, 443)
