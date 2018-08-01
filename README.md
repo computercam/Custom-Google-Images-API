@@ -3,7 +3,6 @@
 ### Summary
 - A very basic image metadata scraper for google images.
 - This scraper's ***main feature*** is the ability to ***get the related images link*** for an image.
-- This scraper also allows for search by image via url
 
 ### Setup
 - Spin up an ubuntu based server distro.
@@ -18,11 +17,6 @@ Query the server with the following format:
 You can query related image results as well.
 
 `http://myserver.com/?keywords=saturn+rain&rimg=123foo_BAR_098_baz`
-
-You can search by image as well.
-
-`http://myserver.com/?sbi=http://www.foo.com/bar.jpg`
-
 
 You can use your favorite XHR library as well
 
