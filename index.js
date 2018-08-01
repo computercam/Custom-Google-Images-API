@@ -84,85 +84,17 @@ http
             })
             return data
           })
-
-          let errors = await page.evaluate(() => {
-            // check to make sure there wasn't an error
-            let err = document.body.innerText
-            err = err.match(/not\ match|doesn\'t\ refer|image\ is\ not\ publicly/gm)
-            if (err !== null) {
-              return true
-            }
-          })
-
-          // If there were no errors, continue
-          if (errors !== true) {
-            // Search by image was specified
-            if (isNotEmpty(q.sbi)) {
-              // If sbi, search the page for a link regarding search by image images
-              gimgSearch = await page.evaluate(() => {
-                let err = document.body.innerText
-                // if it doesn't exist, throw an error
-                err = err.match(/not\ match|doesn\'t\ refer|image\ is\ not\ publicly/gm)
-                if (err === null) {
-                  let href = document.querySelector('#topstuff > .card-section a').getAttribute('href')
-                  return 'https://www.google.com' + href
-                } else {
-                  return false
-                }
-              })
-              // If we were able to find a link to search by image feature, continue
-              if (gimgSearch !== false) {
-                await page.goto(gimgSearch, { waitUntil: 'domcontentloaded' })
-                let findNext = await page.evaluate(() => {
-                  // Evaluate the page for link regarding visually similar images
-                  let err = document.body.innerText
-                  err = err.match(/not\ match|doesn\'t\ refer|image\ is\ not\ publicly/gm)
-                  if (err === null) {
-                    let next = { href: false, keywords: false }
-                    // Check if the visually similar link exists
-                    let el = document.querySelector('.iu-card-header')
-                    if (el !== null) {
-                      next.href = el.getAttribute('href')
-                    } else {
-                      // if it doesn't we can use the keywords instead
-                      let el = document.querySelector('#topstuff > .card-section')
-                      if (el !== null) {
-                        next.keywords = el.lastChild.querySelector('a').getAttribute('href')
-                        next.keywords = next.keywords.match(/q=([^&]+)/g)[0].replace(/q=/g, '')
-                      }
-                    }
-                    return next
-                  } else {
-                    return false
-                  }
-                })
-                // We have either keywords or a link to follow
-                if (findNext !== false && findNext.keywords !== false && findNext.href !== false) {
-                  if (findNext.keywords !== false) {
-                    gimgSearch = parseQuery({ keywords: findNext.keywords })
-                  } else {
-                    gimgSearch = 'https://www.google.com' + findNext.href
-                  }
-                  // go to the page
-                  await page.goto(gimgSearch, { waitUntil: 'load' })
-                  let responseDataSBI = await page.evaluate(() => {
-                    let nodeList = Array.from(
-                      document.querySelectorAll('#search [data-ri]')
-                    )
-                    let data = []
-                    // get the images
-                    nodeList.forEach((node, index) => {
-                      data[index] = JSON.parse(node.lastElementChild.textContent)
-                      data[index].ved = node.dataset.ved
-                    })
-                    return data
-                  })
-                  // add the SBI images to the original set
-                  responseData = responseData.concat(responseDataSBI)
-                }
-              }
-            }
-          }
+          
+          // Eventually we will explicity return a failed state
+          //   let errors = await page.evaluate(() => {
+          //     // check to make sure there wasn't an error
+          //     let err = document.body.innerText
+          //     err = err.match(/not\ match|doesn\'t\ refer|image\ is\ not\ publicly/gm)
+          //     if (err !== null) {
+          //       return true
+          //     }
+          //   })
+          
           await browser.close()
         })
         .then(() => {
