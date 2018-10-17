@@ -1,153 +1,46 @@
-const http = require('http')
-const url = require('url')
+const express = require('express')
 const axios = require('axios')
-const puppeteer = require('puppeteer')
+const modules = require('./modules')
+const app = express()
+const port = 3000
+const debug = false
 
-function cleanMetadata (data, query) {
-  let newData = []
-  data.forEach((item, index) => {
-    newData[index] = {
-      ou: item.ou,
-      oh: item.oh,
-      ow: item.ow,
-      tu: item.tu,
-      th: item.th,
-      tw: item.tw,
-      rimg: item.rimg,
-      ru: item.ru,
-      pt: item.pt,
-      st: item.st,
-      s: item.s
-    }
-    if (typeof query.retain !== 'undefined') {
-      let retain = query.retain
-      retain = JSON.parse(retain)
-      newData[index].okeys = retain.okeys
-      newData[index].ocats = retain.ocats
-    }
-  })
-  console.log(newData)
-  return newData
-}
-
-function cleanSbi (url) {
-  return url.replace(/^((.+\/[^.]+)(\.jpg|\.gif|\.jpeg|\.png|\.bmp|tiff))(.+)$/g, '$1')
-}
-
-function isNotEmpty (str) {
-  return !(!str || str.length === 0 || typeof str === 'undefined')
-}
-
-function parseQuery (q) {
-  let str = 'https://google.com/search?q='
-  if (isNotEmpty(q.sbi)) {
-    q.sbi = cleanSbi(q.sbi)
-    str += encodeURIComponent(q.sbi) + '&tbm=isch'
+app.get('/', (req, res) => {
+  // Only process the request if the keywords query was included
+  if (req.query.keywords.trim()) {
+    (async () => {
+      const { parseQuery, gimgSearch, rimgRequests, cleanMetadata } = modules
+      const gimgQuery = parseQuery(req.query)
+      let results = await gimgSearch(gimgQuery.str, debug)
+      if (results.length > 0) {
+        const requests = rimgRequests(results, gimgQuery.q, axios)
+        axios.all(requests).then((res) => {
+          console.log(res)
+        }).catch((err) => {
+          console.log(err)
+        })
+        // relatedImages.forEach((result, index) => {
+        //   let rimg = result.data.match(/tbs=rimg:([A-Za-z0-9_-])+/gm)
+        //   if (rimg === null) {
+        //     results[index].rimg = false
+        //   } else {
+        //     results[index].rimg = rimg[0].replace(/tbs=rimg:/gm, '')
+        //   }
+        // })
+        // results = cleanMetadata(results, gimgQuery.q)
+        // res.json(results)
+        res.end()
+      } else {
+        res.json({ error: 'Your query yeiled no results.' })
+        res.end()
+      }
+    })(req, res, modules, debug)
   } else {
-    q.keywords = q.keywords.replace(/\s+/gm, '+')
-    if (isNotEmpty(q.keywords)) str += q.keywords + '&tbm=isch'
-    if (isNotEmpty(q.rimg)) str += '&tbs=rimg:' + q.rimg
+    res.json({ error: 'You did no specify any keywords to use.' })
+    res.end()
   }
-  if (isNotEmpty(q.safe)) str += '&safe=active'
-  return str
-}
+})
 
-let responseData = ''
-
-http
-  .createServer(function (req, res) {
-    res.setHeader('Content-Type', 'text/json')
-    res.setHeader('Access-Control-Allow-Origin', '*')
-    res.setHeader('Access-Control-Allow-Methods', 'GET')
-
-    if (req.url.match(/keywords|sbi/gm)) {
-      const q = url.parse(req.url, true).query
-      let gimgSearch = parseQuery(q)
-
-      puppeteer
-        .launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
-        .then(async browser => {
-          const page = await browser.newPage()
-
-          // the initial search
-          await page.goto(gimgSearch, { waitUntil: 'load' })
-
-          // Grab the images on the page
-          responseData = await page.evaluate(() => {
-            let nodeList = Array.from(
-              document.querySelectorAll('#search [data-ri]')
-            )
-            let data = []
-            nodeList.forEach((node, index) => {
-              data[index] = JSON.parse(node.lastElementChild.textContent)
-              data[index].ved = node.dataset.ved
-            })
-            return data
-          })
-          
-          // Eventually we will explicity return a failed state
-          //   let errors = await page.evaluate(() => {
-          //     // check to make sure there wasn't an error
-          //     let err = document.body.innerText
-          //     err = err.match(/not\ match|doesn\'t\ refer|image\ is\ not\ publicly/gm)
-          //     if (err !== null) {
-          //       return true
-          //     }
-          //   })
-          
-          await browser.close()
-        })
-        .then(() => {
-          // Getting related image links.
-          if (responseData.length > 0) {
-            let requests = []
-            responseData.forEach((item, index) => {
-              requests[index] = axios({
-                timeout: 10000,
-                baseURL: 'https://www.google.com/async/',
-                url: '/imgrc',
-                method: 'get',
-                responseType: 'text',
-                params: {
-                  q: q.keywords,
-                  ved: item.ved,
-                  vet: '1' + item + '..i',
-                  imgurl: item.ou,
-                  imgrefurl: item.ru,
-                  tbnid: item.id,
-                  docid: item.rid,
-                  imgdii: item.id,
-                  async: 'cidx:1,saved:0,lp:0,_id:irc_imgrc1,_pms:s,_fmt:pc'
-                },
-                headers: {
-                  'user-agent':
-                  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/65.0.3325.181 Chrome/65.0.3325.181 Safari/537.36'
-                }
-              })
-            })
-            axios
-              .all(requests)
-              .then(function (results) {
-                results.forEach((result, index) => {
-                  let rimg = result.data.match(/tbs=rimg:([A-Za-z0-9_-])+/gm)
-                  if (rimg === null) {
-                    responseData[index].rimg = false
-                  } else {
-                    responseData[index].rimg = rimg[0].replace(/tbs=rimg:/gm, '')
-                  }
-                })
-              })
-              .then(() => {
-                responseData = cleanMetadata(responseData, q)
-                res.write(JSON.stringify(responseData))
-                res.end()
-              })
-          } else {
-            res.end()
-          }
-        })
-    } else {
-      res.end()
-    }
-  })
-  .listen(8080)
+app.listen(port, () => {
+  console.log(`Express started listening on port ${port}`)
+})
