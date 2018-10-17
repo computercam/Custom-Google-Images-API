@@ -14,25 +14,12 @@ app.get('/', (req, res) => {
       let results = await gimgSearch(gimgQuery.str, debug)
       if (results.length > 0) {
         const requests = rimgRequests(results, gimgQuery.q, axios)
-        axios.all(requests).then((res) => {
-          console.log(res)
-        }).catch((err) => {
-          console.log(err)
-        })
-        // relatedImages.forEach((result, index) => {
-        //   let rimg = result.data.match(/tbs=rimg:([A-Za-z0-9_-])+/gm)
-        //   if (rimg === null) {
-        //     results[index].rimg = false
-        //   } else {
-        //     results[index].rimg = rimg[0].replace(/tbs=rimg:/gm, '')
-        //   }
-        // })
-        // results = cleanMetadata(results, gimgQuery.q)
-        // res.json(results)
+        results = cleanMetadata(results, gimgQuery.q)
+        res.json(results)
         res.end()
       } else {
         res.json({ error: 'Your query yeiled no results.' })
-        res.end()
+        res.end() 
       }
     })(req, res, modules, debug)
   } else {
@@ -40,7 +27,6 @@ app.get('/', (req, res) => {
     res.end()
   }
 })
-
 app.listen(port, () => {
   console.log(`Express started listening on port ${port}`)
 })

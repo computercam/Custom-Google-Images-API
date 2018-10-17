@@ -22,6 +22,15 @@ module.exports = function (results, keywords, axios) {
         'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/65.0.3325.181 Chrome/65.0.3325.181 Safari/537.36'
       }
     })
+    const relatedImages = await axios.all(requests)
+    relatedImages.forEach((result, index) => {
+      let rimg = result.data.match(/tbs=rimg:([A-Za-z0-9_-])+/gm)
+      if (rimg === null) {
+        results[index].rimg = false
+      } else {
+        results[index].rimg = rimg[0].replace(/tbs=rimg:/gm, '')
+      }
+    })
   })
   return requests
 }
