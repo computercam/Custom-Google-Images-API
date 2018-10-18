@@ -1,0 +1,12 @@
+{
+  "email": "__ACME_EMAIL__",
+  "domain": "__FQDN_DOMAIN__",
+  "origin": "__ALLOW_ORIGIN_DOMAIN__",
+  "port": {
+    "http": 80,
+    "https": 443,
+    "local": 3000
+  },
+  "debug": false,
+  "local": false
+}
