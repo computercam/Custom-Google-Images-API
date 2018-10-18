@@ -33,7 +33,7 @@ require('greenlock-express').create({
         }
       })(req, res, modules, debug)
     } else {
-      res.json({ error: 'You did no specify any keywords to use.' })
+      res.json({ error: 'You did not specify any keywords to use.' })
       res.end()
     }
   })
