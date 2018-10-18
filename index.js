@@ -1,25 +1,23 @@
 const express = require('express')
-const axios = require('axios')
 const modules = require('./modules')
 const app = express()
 const port = 3000
 const debug = false
-
 app.get('/', (req, res) => {
   // Only process the request if the keywords query was included
-  if (req.query.keywords.trim()) {
+  if (req.query.keywords) {
     (async () => {
-      const { parseQuery, gimgSearch, rimgRequests, cleanMetadata } = modules
+      const { parseQuery, gimgSearch, getRimg, cleanMetadata } = modules
       const gimgQuery = parseQuery(req.query)
       let results = await gimgSearch(gimgQuery.str, debug)
       if (results.length > 0) {
-        const requests = rimgRequests(results, gimgQuery.q, axios)
+        results = await getRimg(results, gimgQuery.q)
         results = cleanMetadata(results, gimgQuery.q)
         res.json(results)
         res.end()
       } else {
         res.json({ error: 'Your query yeiled no results.' })
-        res.end() 
+        res.end()
       }
     })(req, res, modules, debug)
   } else {
