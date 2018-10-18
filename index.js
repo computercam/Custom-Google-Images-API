@@ -7,12 +7,12 @@ app.get('/', (req, res) => {
   // Only process the request if the keywords query was included
   if (req.query.keywords) {
     (async () => {
-      const { parseQuery, gimgSearch, getRimg, cleanMetadata } = modules
-      const gimgQuery = parseQuery(req.query)
-      let results = await gimgSearch(gimgQuery.str, debug)
+      const { parseQuery, gimgSearch, getRimg, cleanResults } = modules
+      const gimgQueryStr = parseQuery(req.query)
+      let results = await gimgSearch(gimgQueryStr, req.query, debug)
       if (results.length > 0) {
-        results = await getRimg(results, gimgQuery.q)
-        results = cleanMetadata(results, gimgQuery.q)
+        results = await getRimg(results, req.query.keywords)
+        results = cleanResults(results, req.query)
         res.json(results)
         res.end()
       } else {

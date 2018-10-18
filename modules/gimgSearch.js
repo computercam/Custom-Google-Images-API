@@ -1,9 +1,15 @@
+const drop = require('lodash.drop')
+const take = require('lodash.take')
 const puppeteer = require('puppeteer')
-module.exports = async (query, debug) => {
-  const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'], headless: !debug })
+module.exports = async (queryStr, query, debug) => {
+  const { start, limit } = query
+  const browser = await puppeteer.launch({
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    headless: !debug
+  })
   const page = await browser.newPage()
-  await page.goto(query, { waitUntil: 'load' })
-  const pageEval = await page.evaluate(() => {
+  await page.goto(queryStr, { waitUntil: 'load' })
+  let results = await page.evaluate(() => {
     let nodeList = Array.from(document.querySelectorAll('#search [data-ri]'))
     let data = []
     nodeList.forEach((node, index) => {
@@ -13,5 +19,11 @@ module.exports = async (query, debug) => {
     return data
   })
   await browser.close()
-  return pageEval
+  if (start && start > 0 && start < results.length) {
+    results = drop(results, start)
+  }
+  if (limit && limit > 0 && limit < results.length) {
+    results = take(results, limit)
+  }
+  return results
 }

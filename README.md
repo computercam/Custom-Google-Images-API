@@ -40,6 +40,6 @@ axios.get('http://myserver.com/?keywords=diamon+rain')
 
 ### 
 ### What's it using?
-- Node JS for the base.
+- ExpressJS for the webserver.
 - Puppeteer for scraping.
 - Axios for XHR.
