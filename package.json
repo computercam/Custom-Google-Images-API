@@ -17,7 +17,7 @@
   },
   "homepage": "https://gitlab.com/abstracted1/gimgmetadata",
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "express": "^4.16.4",
     "greenlock-express": "^2.4.6",
     "lodash.drop": "^4.1.1",
