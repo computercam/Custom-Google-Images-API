@@ -22,7 +22,7 @@
     "greenlock-express": "^2.4.6",
     "lodash.drop": "^4.1.1",
     "lodash.take": "^4.1.1",
-    "puppeteer": "^1.9.0"
+    "puppeteer": "^1.13.0"
   },
   "repository": {
     "type": "git",
